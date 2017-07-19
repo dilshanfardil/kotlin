@@ -40,3 +40,21 @@ public inline fun Double.isFinite(): Boolean = !isInfinite() && !isNaN()
  */
 @kotlin.internal.InlineOnly
 public inline fun Float.isFinite(): Boolean = !isInfinite() && !isNaN()
+
+
+@kotlin.internal.InlineOnly
+public inline fun Double.toBits(): Long = java.lang.Double.doubleToLongBits(this)
+@kotlin.internal.InlineOnly
+public inline fun Double.toRawBits(): Long = java.lang.Double.doubleToRawLongBits(this)
+@kotlin.internal.InlineOnly
+public inline fun Double.Companion.fromBits(bits: Long) = java.lang.Double.longBitsToDouble(bits)
+
+
+@kotlin.internal.InlineOnly
+public inline fun Float.toBits(): Int = java.lang.Float.floatToIntBits(this)
+@kotlin.internal.InlineOnly
+public inline fun Float.toRawBits(): Int = java.lang.Float.floatToRawIntBits(this)
+@kotlin.internal.InlineOnly
+public inline fun Float.Companion.fromBits(bits: Int): Float = java.lang.Float.intBitsToFloat(bits)
+
+
