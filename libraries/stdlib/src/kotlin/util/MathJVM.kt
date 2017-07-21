@@ -268,13 +268,61 @@ public fun log2(a: Double): Double = nativeMath.log(a) / LN2
 @InlineOnly
 public inline fun log1p(a: Double): Double = nativeMath.log1p(a)
 
-public inline fun ceil(a: Double): Double = nativeMath.ceil(a)
-public inline fun floor(a: Double): Double = nativeMath.floor(a)
-public inline fun truncate(a: Double): Double = nativeMath.rint(a)
+/**
+ * Rounds the given value [a] to an integer towards positive infinity.
 
-// also as extension val [absoluteValue]
+ * @return the smallest double value that is greater than the given value [a] and is a mathematical integer.
+ *
+ * Special cases:
+ *     - `ceil(x)` is `x` where `x` is `NaN` or `+Inf` or `-Inf` or already a mathematical integer.
+ */
+@InlineOnly
+public inline fun ceil(a: Double): Double = nativeMath.ceil(a)
+
+/**
+ * Rounds the given value [a] to an integer towards negative infinity.
+
+ * @return the largest double value that is smaller than the given value [a] and is a mathematical integer.
+ *
+ * Special cases:
+ *     - `floor(x)` is `x` where `x` is `NaN` or `+Inf` or `-Inf` or already a mathematical integer.
+ */
+@InlineOnly
+public inline fun floor(a: Double): Double = nativeMath.floor(a)
+
+/**
+ * Rounds the given value [a] to an integer towards zero.
+ *
+ * @return the value [a] having its fractional part truncated.
+ *
+ * Special cases:
+ *     - `truncate(x)` is `x` where `x` is `NaN` or `+Inf` or `-Inf` or already a mathematical integer.
+ */
+public fun truncate(a: Double): Double = when {
+    a.isNaN() || a.isInfinite() -> a
+    a > 0 -> floor(a)
+    else -> ceil(a)
+}
+
+/**
+ * Rounds the given value [a] toward the closest integer with ties rounded up.
+ *
+ * Special cases:
+ *     - `round(x)` is `x` where `x` is `NaN` or `+Inf` or `-Inf` or already a mathematical integer.
+ */
+@InlineOnly
+public inline fun round(a: Double): Double = nativeMath.floor(a + 0.5)
+
+
+/**
+ * Returns the absolute value of the given value [a].
+ *
+ * @see absoluteValue extension property for [Double]
+ */
+@InlineOnly
 public inline fun abs(a: Double): Double = nativeMath.abs(a)
 // also as extension val [sign]
+@InlineOnly
 public inline fun sgn(a: Double): Double = nativeMath.signum(a)
 
 
@@ -316,6 +364,12 @@ public inline fun Double.nextUp(): Double = nativeMath.nextUp(this)
 public inline fun Double.nextDown(): Double = nativeMath.nextAfter(this, Double.NEGATIVE_INFINITY)
 public inline fun Double.nextTowards(to: Double): Double = nativeMath.nextAfter(this, to)
 
+fun Double.roundToInt(): Int = when {
+    isNaN() -> throw IllegalArgumentException("Cannot round NaN value.")
+    this > Int.MAX_VALUE -> Int.MAX_VALUE
+    this < Int.MIN_VALUE -> Int.MIN_VALUE
+    else -> nativeMath.round(this).toInt()
+}
 public fun Double.roundToLong(): Long = if (isNaN()) throw IllegalArgumentException("Cannot round NaN value.") else nativeMath.round(this)
 
 

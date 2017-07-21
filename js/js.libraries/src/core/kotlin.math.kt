@@ -265,10 +265,47 @@ public fun log2(a: Double): Double = nativeMath.log2(a)
 @InlineOnly
 public inline fun log1p(a: Double): Double = nativeMath.log1p(a)
 
+/**
+ * Rounds the given value [a] to an integer towards positive infinity.
 
-inline fun ceil(a: Double): Double = nativeMath.ceil(a).unsafeCast<Double>() // TODO: Remove unsafe cast after removing public js.math
-inline fun floor(a: Double): Double = nativeMath.floor(a).unsafeCast<Double>()
-inline fun truncate(a: Double): Double = nativeMath.trunc(a) // polyfill
+ * @return the smallest double value that is greater than the given value [a] and is a mathematical integer.
+ *
+ * Special cases:
+ *     - `ceil(x)` is `x` where `x` is `NaN` or `+Inf` or `-Inf` or already a mathematical integer.
+ */
+@InlineOnly
+public inline fun ceil(a: Double): Double = nativeMath.ceil(a).unsafeCast<Double>() // TODO: Remove unsafe cast after removing public js.math
+
+/**
+ * Rounds the given value [a] to an integer towards negative infinity.
+
+ * @return the largest double value that is smaller than the given value [a] and is a mathematical integer.
+ *
+ * Special cases:
+ *     - `floor(x)` is `x` where `x` is `NaN` or `+Inf` or `-Inf` or already a mathematical integer.
+ */
+@InlineOnly
+public inline fun floor(a: Double): Double = nativeMath.floor(a).unsafeCast<Double>()
+
+/**
+ * Rounds the given value [a] to an integer towards zero.
+ *
+ * @return the value [a] having its fractional part truncated.
+ *
+ * Special cases:
+ *     - `truncate(x)` is `x` where `x` is `NaN` or `+Inf` or `-Inf` or already a mathematical integer.
+ */
+@InlineOnly
+public inline fun truncate(a: Double): Double = nativeMath.trunc(a)
+
+/**
+ * Rounds the given value [a] toward the closest integer with ties rounded up.
+ *
+ * Special cases:
+ *     - `round(x)` is `x` where `x` is `NaN` or `+Inf` or `-Inf` or already a mathematical integer.
+ */
+@InlineOnly
+public inline fun round(a: Double): Double = nativeMath.round(a).unsafeCast<Double>()
 
 // also as extension val [absoluteValue]
 inline fun abs(a: Double): Double = nativeMath.abs(a)
@@ -291,7 +328,19 @@ fun Double.withSign(sign: Double): Double = this.absoluteValue * sign.sign
 inline fun Double.withSign(sign: Int): Double = this.withSign(sign.toDouble())
 
 
-fun Double.roundToLong(): Long = if (isNaN()) throw IllegalArgumentException("Cannot round NaN value.") else nativeMath.round(this).unsafeCast<Double>().toLong()
+fun Double.roundToInt(): Int = when {
+    isNaN() -> throw IllegalArgumentException("Cannot round NaN value.")
+    this > Int.MAX_VALUE -> Int.MAX_VALUE
+    this < Int.MIN_VALUE -> Int.MIN_VALUE
+    else -> nativeMath.round(this).unsafeCast<Double>().toInt()
+}
+
+fun Double.roundToLong(): Long = when {
+    isNaN() -> throw IllegalArgumentException("Cannot round NaN value.")
+    this > Long.MAX_VALUE -> Long.MAX_VALUE
+    this < Long.MIN_VALUE -> Long.MIN_VALUE
+    else -> nativeMath.round(this).unsafeCast<Double>().toLong()
+}
 
 
 
@@ -313,7 +362,7 @@ inline fun Float.withSign(sign: Float): Float = this.toDouble().withSign(sign.to
 inline fun Float.withSign(sign: Int): Float = this.toDouble().withSign(sign.toDouble()).toFloat()
 
 
-fun Float.roundToInt(): Int = if (isNaN()) throw IllegalArgumentException("Cannot round NaN value.") else nativeMath.round(this)
+fun Float.roundToInt(): Int = toDouble().roundToInt()
 fun Float.roundToLong(): Long = toDouble().roundToLong()
 
 
