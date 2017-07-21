@@ -19,7 +19,6 @@ package org.jetbrains.kotlin.types;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.kotlin.builtins.KotlinBuiltIns;
 import org.jetbrains.kotlin.descriptors.*;
-import org.jetbrains.kotlin.name.FqNameUnsafe;
 import org.jetbrains.kotlin.resolve.DescriptorUtils;
 import org.jetbrains.kotlin.resolve.descriptorUtil.DescriptorUtilsKt;
 import org.jetbrains.kotlin.storage.StorageManager;
@@ -62,6 +61,7 @@ public abstract class AbstractClassTypeConstructor extends AbstractTypeConstruct
 
     @Override
     public final boolean equals(Object other) {
+        if (this == other) return true;
         if (!(other instanceof TypeConstructor)) return false;
 
         // performance optimization: getFqName is slow method
