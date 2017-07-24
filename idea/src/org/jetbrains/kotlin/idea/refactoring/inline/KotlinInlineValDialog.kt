@@ -65,8 +65,6 @@ class KotlinInlineValDialog(
 
     fun shouldBeShown() = !forSimpleLocal() || EditorSettingsExternalizable.getInstance().isShowInlineLocalDialog
 
-    override fun allowInlineAll() = true
-
     override fun getBorderTitle() = refactoringName
 
     override fun getNameLabelText() = "${kind.capitalize()} ${property.name}"
