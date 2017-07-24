@@ -121,7 +121,8 @@ abstract class BaseDiagnosticsTest : KotlinMultiFileTestWithJava<TestModule, Tes
         override fun getFeatureSupport(feature: LanguageFeature): LanguageFeature.State =
                 languageFeatures[feature] ?: delegate.getFeatureSupport(feature)
 
-        override fun isFlagEnabled(flag: AnalysisFlag): Boolean = false
+        @Suppress("UNCHECKED_CAST")
+        override fun <T> getFlag(flag: AnalysisFlag<T>): T = false as T
     }
 
     inner class TestFile(

@@ -19,30 +19,34 @@ package org.jetbrains.kotlin.config
 import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KProperty
 
-class AnalysisFlag internal constructor(private val name: String) {
-    override fun equals(other: Any?): Boolean = other is AnalysisFlag && other.name == name
+class AnalysisFlag<out T> internal constructor(
+        private val name: String,
+        val defaultValue: T
+) {
+    override fun equals(other: Any?): Boolean = other is AnalysisFlag<*> && other.name == name
 
     override fun hashCode(): Int = name.hashCode()
 
     override fun toString(): String = name
 
-    companion object
-}
+    private class Flag<T>(name: String, defaultValue: T) : ReadOnlyProperty<Any?, AnalysisFlag<T>> {
+        private val flag = AnalysisFlag(name, defaultValue)
 
-private operator fun @Suppress("unused") AnalysisFlag.Companion.provideDelegate(instance: Any?, property: KProperty<*>) =
-        object : ReadOnlyProperty<Any?, AnalysisFlag> {
-            private val flag = AnalysisFlag(property.name)
+        override fun getValue(thisRef: Any?, property: KProperty<*>): AnalysisFlag<T> = flag
 
-            override fun getValue(thisRef: Any?, property: KProperty<*>): AnalysisFlag = flag
+        object Boolean {
+            operator fun provideDelegate(instance: Any?, property: KProperty<*>) = Flag(property.name, false)
         }
+    }
 
-object AnalysisFlags {
-    @JvmStatic
-    val skipMetadataVersionCheck by AnalysisFlag
+    companion object Flags {
+        @JvmStatic
+        val skipMetadataVersionCheck by Flag.Boolean
 
-    @JvmStatic
-    val multiPlatformDoNotCheckImpl by AnalysisFlag
+        @JvmStatic
+        val multiPlatformDoNotCheckImpl by Flag.Boolean
 
-    @JvmStatic
-    val loadJsr305Annotations by AnalysisFlag
+        @JvmStatic
+        val loadJsr305Annotations by Flag.Boolean
+    }
 }
