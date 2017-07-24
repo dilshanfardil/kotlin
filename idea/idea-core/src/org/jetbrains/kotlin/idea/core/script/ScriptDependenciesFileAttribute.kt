@@ -19,8 +19,8 @@ package org.jetbrains.kotlin.idea.core.script
 import com.intellij.openapi.components.service
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.VirtualFileWithId
-import com.intellij.util.io.DataInputOutputUtil.readSeq
-import com.intellij.util.io.DataInputOutputUtil.writeSeq
+import com.intellij.util.io.DataInputOutputUtil.readINT
+import com.intellij.util.io.DataInputOutputUtil.writeINT
 import com.intellij.util.io.IOUtil.readUTF
 import com.intellij.util.io.IOUtil.writeUTF
 import org.jetbrains.kotlin.idea.caches.FileAttributeService
@@ -84,6 +84,16 @@ object ScriptDependenciesFileAttribute {
             )
         }
     }
+}
+
+fun <T> readSeq(`in`: DataInput, readElement: () -> T): List<T> {
+    val size = readINT(`in`)
+    return (0 until size).map { readElement() }
+}
+
+fun <T> writeSeq(out: DataOutput, collection: Collection<T>, writeElement: (T) -> Unit) {
+    writeINT(out, collection.size)
+    collection.forEach(writeElement)
 }
 
 private fun DataInput.readStringList(): List<String> = readSeq(this) { readString() }
