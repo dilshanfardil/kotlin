@@ -51,7 +51,8 @@ class KotlinToResolvedCallTransformer(
         private val languageFeatureSettings: LanguageVersionSettings,
         private val dataFlowAnalyzer: DataFlowAnalyzer,
         private val argumentTypeResolver: ArgumentTypeResolver,
-        private val constantExpressionEvaluator: ConstantExpressionEvaluator
+        private val constantExpressionEvaluator: ConstantExpressionEvaluator,
+        private val deprecationProvider: DeprecationProvider
 ) {
 
     fun <D : CallableDescriptor> transformAndReport(
@@ -65,7 +66,7 @@ class KotlinToResolvedCallTransformer(
             allResolvedCalls.add(result)
 
             if (trace != null) {
-                val callCheckerContext = CallCheckerContext(context.replaceBindingTrace(trace), languageFeatureSettings)
+                val callCheckerContext = CallCheckerContext(context.replaceBindingTrace(trace), languageFeatureSettings, deprecationProvider)
                 for (resolvedCall in allResolvedCalls) {
                     runCallCheckers(resolvedCall, callCheckerContext)
                 }

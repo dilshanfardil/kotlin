@@ -21,18 +21,19 @@ import org.jetbrains.kotlin.config.LanguageVersionSettings
 import org.jetbrains.kotlin.descriptors.ClassifierDescriptor
 import org.jetbrains.kotlin.psi.KtThisExpression
 import org.jetbrains.kotlin.resolve.BindingTrace
+import org.jetbrains.kotlin.resolve.DeprecationProvider
 import org.jetbrains.kotlin.resolve.createDeprecationDiagnostic
-import org.jetbrains.kotlin.resolve.getDeprecations
 
 class DeprecatedClassifierUsageChecker : ClassifierUsageChecker {
     override fun check(
             targetDescriptor: ClassifierDescriptor,
             trace: BindingTrace,
             element: PsiElement,
-            languageVersionSettings: LanguageVersionSettings
+            languageVersionSettings: LanguageVersionSettings,
+            deprecationProvider: DeprecationProvider
     ) {
         if (element.parent is KtThisExpression) return
-        for (deprecation in targetDescriptor.getDeprecations(languageVersionSettings)) {
+        for (deprecation in deprecationProvider.getDeprecations(targetDescriptor)) {
             trace.report(createDeprecationDiagnostic(element, deprecation, languageVersionSettings))
         }
     }

@@ -26,10 +26,7 @@ import org.jetbrains.kotlin.platform.PlatformToKotlinClassMap
 import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.psi.KtImportDirective
 import org.jetbrains.kotlin.psi.KtImportsFactory
-import org.jetbrains.kotlin.resolve.BindingTrace
-import org.jetbrains.kotlin.resolve.ImportPath
-import org.jetbrains.kotlin.resolve.QualifiedExpressionResolver
-import org.jetbrains.kotlin.resolve.TemporaryBindingTrace
+import org.jetbrains.kotlin.resolve.*
 import org.jetbrains.kotlin.resolve.scopes.DescriptorKindFilter
 import org.jetbrains.kotlin.resolve.scopes.ImportingScope
 import org.jetbrains.kotlin.resolve.scopes.LexicalScope
@@ -51,7 +48,8 @@ class FileScopeFactory(
         private val ktImportsFactory: KtImportsFactory,
         private val platformToKotlinClassMap: PlatformToKotlinClassMap,
         private val defaultImportProvider: DefaultImportProvider,
-        private val languageVersionSettings: LanguageVersionSettings
+        private val languageVersionSettings: LanguageVersionSettings,
+        private val deprecationProvider: DeprecationProvider
 ) {
     /* avoid constructing psi for default imports prematurely (time consuming in some scenarios) */
     private val defaultImports by storageManager.createLazyValue {
@@ -142,27 +140,30 @@ class FileScopeFactory(
 
             val debugName = "LazyFileScope for file " + file.name
             scope = LazyImportScope(existingImports, defaultAllUnderImportResolver, LazyImportScope.FilteringKind.INVISIBLE_CLASSES,
-                                    "Default all under imports in $debugName (invisible classes only)")
+                                    "Default all under imports in $debugName (invisible classes only)", deprecationProvider)
 
             scope = LazyImportScope(scope, allUnderImportResolver, LazyImportScope.FilteringKind.INVISIBLE_CLASSES,
-                                    "All under imports in $debugName (invisible classes only)")
+                                    "All under imports in $debugName (invisible classes only)", deprecationProvider)
 
             scope = currentPackageScope(packageView, aliasImportNames, dummyContainerDescriptor, FilteringKind.INVISIBLE_CLASSES, scope)
 
             scope = LazyImportScope(scope, defaultAllUnderImportResolver, LazyImportScope.FilteringKind.VISIBLE_CLASSES,
-                                    "Default all under imports in $debugName (visible classes)")
+                                    "Default all under imports in $debugName (visible classes)", deprecationProvider)
 
             scope = LazyImportScope(scope, allUnderImportResolver, LazyImportScope.FilteringKind.VISIBLE_CLASSES,
-                                    "All under imports in $debugName (visible classes)")
+                                    "All under imports in $debugName (visible classes)", deprecationProvider)
 
             scope = LazyImportScope(scope, defaultExplicitImportResolver, LazyImportScope.FilteringKind.ALL,
-                                    "Default explicit imports in $debugName")
+                                    "Default explicit imports in $debugName", deprecationProvider)
 
             scope = SubpackagesImportingScope(scope, moduleDescriptor, FqName.ROOT)
 
             scope = currentPackageScope(packageView, aliasImportNames, dummyContainerDescriptor, FilteringKind.VISIBLE_CLASSES, scope)
 
-            return LazyImportScope(scope, explicitImportResolver, LazyImportScope.FilteringKind.ALL, "Explicit imports in $debugName")
+            return LazyImportScope(
+                    scope, explicitImportResolver, LazyImportScope.FilteringKind.ALL, "Explicit imports in $debugName",
+                    deprecationProvider
+            )
         }
 
         private infix fun <T> Collection<T>.concat(other: Collection<T>?) =

@@ -196,7 +196,8 @@ class LazyImportScope(
         override val parent: ImportingScope?,
         private val importResolver: LazyImportResolver,
         private val filteringKind: LazyImportScope.FilteringKind,
-        private val debugName: String
+        private val debugName: String,
+        private val deprecationProvider: DeprecationProvider
 ) : ImportingScope {
 
     enum class FilteringKind {
@@ -208,7 +209,7 @@ class LazyImportScope(
     private fun isClassifierVisible(descriptor: ClassifierDescriptor): Boolean {
         if (filteringKind == FilteringKind.ALL) return true
 
-        if (descriptor.isHiddenInResolution(importResolver.languageVersionSettings)) return false
+        if (deprecationProvider.isHiddenInResolution(descriptor)) return false
 
         val visibility = (descriptor as DeclarationDescriptorWithVisibility).visibility
         val includeVisible = filteringKind == FilteringKind.VISIBLE_CLASSES

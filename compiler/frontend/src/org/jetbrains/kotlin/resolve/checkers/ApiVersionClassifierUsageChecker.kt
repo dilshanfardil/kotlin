@@ -21,6 +21,7 @@ import org.jetbrains.kotlin.config.LanguageVersionSettings
 import org.jetbrains.kotlin.descriptors.ClassifierDescriptor
 import org.jetbrains.kotlin.diagnostics.Errors
 import org.jetbrains.kotlin.resolve.BindingTrace
+import org.jetbrains.kotlin.resolve.DeprecationProvider
 import org.jetbrains.kotlin.resolve.checkSinceKotlinVersionAccessibility
 
 object ApiVersionClassifierUsageChecker : ClassifierUsageChecker {
@@ -28,7 +29,7 @@ object ApiVersionClassifierUsageChecker : ClassifierUsageChecker {
             targetDescriptor: ClassifierDescriptor,
             trace: BindingTrace,
             element: PsiElement,
-            languageVersionSettings: LanguageVersionSettings
+            languageVersionSettings: LanguageVersionSettings, deprecationProvider: DeprecationProvider
     ) {
         targetDescriptor.checkSinceKotlinVersionAccessibility(languageVersionSettings) { version ->
             trace.report(Errors.API_NOT_AVAILABLE.on(element, version.versionString, languageVersionSettings.apiVersion.versionString))

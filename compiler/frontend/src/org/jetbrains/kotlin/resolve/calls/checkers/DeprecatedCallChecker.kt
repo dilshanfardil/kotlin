@@ -29,27 +29,29 @@ import org.jetbrains.kotlin.psi.KtCallableReferenceExpression
 import org.jetbrains.kotlin.psi.KtReferenceExpression
 import org.jetbrains.kotlin.psi.KtUnaryExpression
 import org.jetbrains.kotlin.resolve.BindingTrace
+import org.jetbrains.kotlin.resolve.DeprecationProvider
 import org.jetbrains.kotlin.resolve.calls.model.ResolvedCall
 import org.jetbrains.kotlin.resolve.calls.util.FakeCallableDescriptorForObject
 import org.jetbrains.kotlin.resolve.createDeprecationDiagnostic
-import org.jetbrains.kotlin.resolve.getDeprecations
 
 object DeprecatedCallChecker : CallChecker {
     override fun check(resolvedCall: ResolvedCall<*>, reportOn: PsiElement, context: CallCheckerContext) {
-        check(resolvedCall.resultingDescriptor, context.trace, reportOn, context.languageVersionSettings)
+        check(resolvedCall.resultingDescriptor, context.trace, reportOn, context.languageVersionSettings, context.deprecationProvider)
     }
 
     private fun check(
-            targetDescriptor: CallableDescriptor, trace: BindingTrace, element: PsiElement, languageVersionSettings: LanguageVersionSettings
+            targetDescriptor: CallableDescriptor, trace: BindingTrace, element: PsiElement,
+            languageVersionSettings: LanguageVersionSettings,
+            deprecationProvider: DeprecationProvider
     ) {
         // Objects will be checked by DeprecatedClassifierUsageChecker
         if (targetDescriptor is FakeCallableDescriptorForObject) return
 
-        val deprecations = targetDescriptor.getDeprecations(languageVersionSettings).toMutableList()
+        val deprecations = deprecationProvider.getDeprecations(targetDescriptor).toMutableList()
 
         // avoid duplicating diagnostic when deprecation for property effectively deprecates setter
         if (targetDescriptor is PropertySetterDescriptor) {
-            deprecations -= targetDescriptor.correspondingProperty.getDeprecations(languageVersionSettings)
+            deprecations -= deprecationProvider.getDeprecations(targetDescriptor.correspondingProperty)
         }
 
         if (deprecations.isNotEmpty()) {
@@ -58,7 +60,7 @@ object DeprecatedCallChecker : CallChecker {
             }
         }
         else if (targetDescriptor is PropertyDescriptor && shouldCheckPropertyGetter(element)) {
-            targetDescriptor.getter?.let { check(it, trace, element, languageVersionSettings) }
+            targetDescriptor.getter?.let { check(it, trace, element, languageVersionSettings, deprecationProvider) }
         }
     }
 

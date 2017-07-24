@@ -28,6 +28,7 @@ import org.jetbrains.kotlin.load.kotlin.KotlinJvmBinaryPackageSourceElement
 import org.jetbrains.kotlin.load.kotlin.KotlinJvmBinarySourceElement
 import org.jetbrains.kotlin.load.kotlin.VirtualFileKotlinClass
 import org.jetbrains.kotlin.resolve.BindingTrace
+import org.jetbrains.kotlin.resolve.DeprecationProvider
 import org.jetbrains.kotlin.resolve.DescriptorToSourceUtils
 import org.jetbrains.kotlin.resolve.DescriptorUtils
 import org.jetbrains.kotlin.resolve.calls.checkers.CallChecker
@@ -102,7 +103,7 @@ class JvmModuleAccessibilityChecker(project: Project) : CallChecker {
                 targetDescriptor: ClassifierDescriptor,
                 trace: BindingTrace,
                 element: PsiElement,
-                languageVersionSettings: LanguageVersionSettings
+                languageVersionSettings: LanguageVersionSettings, deprecationProvider: DeprecationProvider
         ) {
             val virtualFile = element.containingFile.virtualFile
             when (targetDescriptor) {

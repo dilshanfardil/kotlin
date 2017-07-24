@@ -27,6 +27,7 @@ import org.jetbrains.kotlin.psi.KtReferenceExpression
 import org.jetbrains.kotlin.psi.KtTreeVisitorVoid
 import org.jetbrains.kotlin.resolve.BindingContext
 import org.jetbrains.kotlin.resolve.BindingTrace
+import org.jetbrains.kotlin.resolve.DeprecationProvider
 import org.jetbrains.kotlin.resolve.DescriptorUtils
 
 interface ClassifierUsageChecker {
@@ -34,7 +35,7 @@ interface ClassifierUsageChecker {
             targetDescriptor: ClassifierDescriptor,
             trace: BindingTrace,
             element: PsiElement,
-            languageVersionSettings: LanguageVersionSettings
+            languageVersionSettings: LanguageVersionSettings, deprecationProvider: DeprecationProvider
     )
 
     companion object {
@@ -42,6 +43,7 @@ interface ClassifierUsageChecker {
                 declarations: Collection<PsiElement>,
                 trace: BindingTrace,
                 languageVersionSettings: LanguageVersionSettings,
+                deprecationProvider: DeprecationProvider,
                 checkers: Iterable<ClassifierUsageChecker>
         ) {
             val visitor = object : KtTreeVisitorVoid() {
@@ -66,7 +68,7 @@ interface ClassifierUsageChecker {
 
                 private fun runCheckersWithTarget(target: ClassifierDescriptor, expression: KtReferenceExpression) {
                     for (checker in checkers) {
-                        checker.check(target, trace, expression, languageVersionSettings)
+                        checker.check(target, trace, expression, languageVersionSettings, deprecationProvider)
                     }
                 }
 
