@@ -208,5 +208,37 @@ class MathCommonTest {
         assertFails { Double.NaN.roundToInt() }
     }
 
+    @Test fun absoluteValue() {
+        assertTrue(abs(Double.NaN).isNaN())
+        assertTrue(Double.NaN.absoluteValue.isNaN())
+
+        for (value in listOf(0.0, Double.MIN_VALUE, 0.1, 1.0, 1000.0, Double.MAX_VALUE, Double.POSITIVE_INFINITY)) {
+            assertEquals(value, value.absoluteValue)
+            assertEquals(value, (-value).absoluteValue)
+            assertEquals(value, abs(value))
+            assertEquals(value, abs(-value))
+        }
+    }
+
+    @Test fun signum() {
+        assertTrue(sign(Double.NaN).isNaN())
+        assertTrue(Double.NaN.sign.isNaN())
+
+        for (value in listOf(Double.NEGATIVE_INFINITY, -Double.MAX_VALUE, -1.0, -Double.MIN_VALUE)) {
+            assertEquals(-1.0, sign(value))
+            assertEquals(-1.0, value.sign)
+        }
+
+        for (value in listOf(0.0, -0.0)) {
+            assertEquals(value, sign(value))
+            assertEquals(value, value.sign)
+        }
+
+        for (value in listOf(Double.POSITIVE_INFINITY, Double.MAX_VALUE, 1.0, Double.MIN_VALUE)) {
+            assertEquals(1.0, sign(value))
+            assertEquals(1.0, value.sign)
+        }
+    }
+
 }
 

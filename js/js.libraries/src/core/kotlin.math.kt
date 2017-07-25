@@ -307,10 +307,30 @@ public inline fun truncate(a: Double): Double = nativeMath.trunc(a)
 @InlineOnly
 public inline fun round(a: Double): Double = nativeMath.round(a).unsafeCast<Double>()
 
-// also as extension val [absoluteValue]
-inline fun abs(a: Double): Double = nativeMath.abs(a)
-// also as extension val [sign]
-inline fun sgn(a: Double): Double = nativeMath.sign(a)
+/**
+ * Returns the absolute value of the given value [a].
+ *
+ * Special cases:
+ *     - `abs(NaN)` is `NaN`
+ *
+ * @see absoluteValue extension property for [Double]
+ */
+@InlineOnly
+public inline fun abs(a: Double): Double = nativeMath.abs(a)
+
+/**
+ * Returns the sign of the given value [a]:
+ *     - `-1.0` if the value is negative,
+ *     - zero if the value is zero,
+ *     - `1.0` if the value is positive
+ *
+ * Special case:
+ *     - `sign(NaN)` is `NaN`
+ */
+@InlineOnly
+public inline fun sign(a: Double): Double = nativeMath.sign(a)
+
+
 
 inline fun min(a: Double, b: Double): Double = nativeMath.min(a, b)
 inline fun max(a: Double, b: Double): Double = nativeMath.max(a, b)

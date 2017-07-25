@@ -317,13 +317,25 @@ public inline fun round(a: Double): Double = nativeMath.floor(a + 0.5)
 /**
  * Returns the absolute value of the given value [a].
  *
+ * Special cases:
+ *     - `abs(NaN)` is `NaN`
+ *
  * @see absoluteValue extension property for [Double]
  */
 @InlineOnly
 public inline fun abs(a: Double): Double = nativeMath.abs(a)
-// also as extension val [sign]
+
+/**
+ * Returns the sign of the given value [a]:
+ *     - `-1.0` if the value is negative,
+ *     - zero if the value is zero,
+ *     - `1.0` if the value is positive
+ *
+ * Special case:
+ *     - `sign(NaN)` is `NaN`
+ */
 @InlineOnly
-public inline fun sgn(a: Double): Double = nativeMath.signum(a)
+public inline fun sign(a: Double): Double = nativeMath.signum(a)
 
 
 
